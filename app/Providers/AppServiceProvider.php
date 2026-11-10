@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Application\Services\MessagePublisherInterface;
 use App\Domain\Repositories\WorkOrderRepositoryInterface;
 use App\Infrastructure\Messaging\Publishers\WorkOrderRabbitMQPublisher;
+use App\Infrastructure\Messaging\RabbitMQService;
 use App\Infrastructure\Repositories\WorkOrderRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -17,6 +18,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(WorkOrderRepositoryInterface::class, WorkOrderRepository::class);
         $this->app->bind(MessagePublisherInterface::class, WorkOrderRabbitMQPublisher::class);
+        this->app->singleton(RabbitMQService::class, fn () => RabbitMQService::fromEnv());
     }
 
     /**
