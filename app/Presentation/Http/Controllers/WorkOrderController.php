@@ -6,6 +6,8 @@ namespace App\Presentation\Http\Controllers;
 
 use App\Application\DTOs\CreateWorkOrderInputDto;
 use App\Application\UseCases\CreateWorkOrderUseCase;
+use App\Application\UseCases\GetWorkOrderUseCase;
+use App\Domain\Exceptions\WorkOrderNotFoundException;
 use App\Domain\Repositories\WorkOrderRepositoryInterface;
 use App\Presentation\Http\Requests\CreateWorkOrderRequest;
 use App\Presentation\Http\Resources\WorkOrderResource;
@@ -29,14 +31,13 @@ final class WorkOrderController extends Controller
         return response()->json($output, 201);
     }
 
-    public function show(int $id, WorkOrderRepositoryInterface $repository): WorkOrderResource
+    public function show(int $id, GetWorkOrderUseCase $useCase): JsonResponse
     {
-        $order = $repository->findById($id);
-
-        if (!$order) {
-            throw new NotFoundHttpException('Work order not found', null, 404);
+        try {
+            $output = $useCase->execute($id);
+            return response()->json($output, 200);
+        } catch (WorkOrderNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
         }
-
-        return new WorkOrderResource($order);
     }
 }
