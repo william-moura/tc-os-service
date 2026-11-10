@@ -8,8 +8,10 @@ use App\Application\DTOs\CreateWorkOrderInputDto;
 use App\Application\UseCases\CreateWorkOrderUseCase;
 use App\Domain\Repositories\WorkOrderRepositoryInterface;
 use App\Presentation\Http\Requests\CreateWorkOrderRequest;
+use App\Presentation\Http\Resources\WorkOrderResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class WorkOrderController extends Controller
 {
@@ -27,21 +29,14 @@ final class WorkOrderController extends Controller
         return response()->json($output, 201);
     }
 
-    public function show(int $id, WorkOrderRepositoryInterface $repository): JsonResponse
+    public function show(int $id, WorkOrderRepositoryInterface $repository): WorkOrderResource
     {
         $order = $repository->findById($id);
 
         if (!$order) {
-            return response()->json(['message' => 'Work order not found'], 404);
+            throw new NotFoundHttpException('Work order not found', null, 404);
         }
 
-        return response()->json([
-            'id' => $order->getId(),
-            'customer_id' => $order->getCustomerId(),
-            'vehicle_plate' => $order->getVehiclePlate()->getValue(),
-            'status' => $order->getStatus()->value,
-            'total_amount' => $order->getTotalAmount(),
-            'notes' => $order->getNotes(),
-        ]);
+        return new WorkOrderResource($order);
     }
 }
