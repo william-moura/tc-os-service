@@ -17,7 +17,7 @@ final class PaymentFailedConsumer
     {
         $connection = new AMQPStreamConnection(
             env('RABBITMQ_HOST', 'localhost'),
-            (int) env('RABBITMQ_PORT', 5672),
+            (string) env('RABBITMQ_PORT', '5672'),
             env('RABBITMQ_USER', 'guest'),
             env('RABBITMQ_PASSWORD', 'guest')
         );
