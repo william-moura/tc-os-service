@@ -7,7 +7,7 @@ namespace App\Application\DTOs;
 final class CreateWorkOrderInputDto
 {
     /**
-     * @param array<array{description: string, quantity: int, unit_price: float}> $items
+     * @param ServiceItemDto[] $items
      */
     public function __construct(
         public readonly int $customerId,
