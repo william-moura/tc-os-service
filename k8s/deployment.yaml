@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tc-os-api
+  labels:
+    app: tc-os-service
+    component: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tc-os-service
+      component: api
+  template:
+    metadata:
+      labels:
+        app: tc-os-service
+        component: api
+    spec:
+      containers:
+        - name: api
+          image: tc-os-service:latest
+          ports:
+            - name: http
+              containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: tc-os-config
+            - secretRef:
+                name: tc-os-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /up
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /up
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tc-os-worker
+  labels:
+    app: tc-os-service
+    component: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tc-os-service
+      component: worker
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: tc-os-service
+        component: worker
+    spec:
+      containers:
+        - name: consumer
+          image: tc-os-service:latest
+          command: ["php", "artisan", "workorder:consume", "--queue=all"]
+          envFrom:
+            - configMapRef:
+                name: tc-os-config
+            - secretRef:
+                name: tc-os-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tc-os-service
+spec:
+  type: ClusterIP
+  selector:
+    app: tc-os-service
+    component: api
+  ports:
+    - port: 80
+      targetPort: http
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: tc-os-api-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: tc-os-api
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
