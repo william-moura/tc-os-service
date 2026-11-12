@@ -18,7 +18,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(WorkOrderRepositoryInterface::class, WorkOrderRepository::class);
         $this->app->bind(MessagePublisherInterface::class, WorkOrderRabbitMQPublisher::class);
-        this->app->singleton(RabbitMQService::class, fn () => RabbitMQService::fromEnv());
+        $this->app->singleton(RabbitMQService::class, fn () => RabbitMQService::fromEnv());
     }
 
     /**
