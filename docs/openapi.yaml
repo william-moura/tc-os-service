@@ -1,0 +1,257 @@
+openapi: 3.0.3
+info:
+  title: tc-os-service API
+  description: |
+    Microsserviço responsável pela gestão do ciclo de vida das Ordens de Serviço (abertura, orçamento, aprovação e histórico).
+    Atua no fluxo da Saga publicando eventos de aprovação e consumindo retornos de pagamento e produção.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8001
+    description: Ambiente Local
+  - url: http://tc-os-service
+    description: Cluster Kubernetes (Interno)
+
+tags:
+  - name: Work Orders
+    description: Operações de abertura, consulta e aprovação de Ordens de Serviço
+
+paths:
+  /api/v1/work-orders:
+    get:
+      tags:
+        - Work Orders
+      summary: Lista todas as Ordens de Serviço
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [CREATED, APPROVED, IN_PRODUCTION, COMPLETED, CANCELLED]
+      responses:
+        '200':
+          description: Lista de Ordens de Serviço
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WorkOrder'
+
+    post:
+      tags:
+        - Work Orders
+      summary: Abre uma nova Ordem de Serviço
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkOrderRequest'
+      responses:
+        '201':
+          description: Ordem de Serviço criada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Work order created successfully.
+                  data:
+                    $ref: '#/components/schemas/WorkOrder'
+        '422':
+          description: Dados de entrada inválidos (ex. placa fora do padrão)
+
+  /api/v1/work-orders/{id}:
+    get:
+      tags:
+        - Work Orders
+      summary: Consulta detalhes e histórico de uma Ordem de Serviço
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 101
+      responses:
+        '200':
+          description: Detalhes da Ordem de Serviço
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/WorkOrder'
+        '404':
+          description: Ordem de Serviço não encontrada
+
+  /api/v1/work-orders/{id}/approve:
+    post:
+      tags:
+        - Work Orders
+      summary: Aprova o orçamento da Ordem de Serviço
+      description: |
+        Altera o status para `APPROVED` e dispara o evento `work_order.approved` via RabbitMQ
+        para geração da cobrança no `tc-billing-service`.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 101
+      responses:
+        '200':
+          description: Ordem de Serviço aprovada e enviada para faturamento
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Work order approved successfully.
+                  data:
+                    $ref: '#/components/schemas/WorkOrder'
+        '404':
+          description: Ordem de Serviço não encontrada
+        '422':
+          description: Transição de status não permitida
+
+  /api/v1/work-orders/{id}/cancel:
+    post:
+      tags:
+        - Work Orders
+      summary: Cancela uma Ordem de Serviço
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 101
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reason
+              properties:
+                reason:
+                  type: string
+                  example: Cliente desistiu do orçamento
+      responses:
+        '200':
+          description: Ordem de Serviço cancelada
+        '422':
+          description: Não é possível cancelar uma OS já concluída
+
+components:
+  schemas:
+    WorkOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 101
+        customer_id:
+          type: integer
+          example: 25
+        vehicle_plate:
+          type: string
+          example: ABC1D23
+        description:
+          type: string
+          example: Revisão completa de freios e suspensão
+        status:
+          type: string
+          enum: [CREATED, APPROVED, IN_PRODUCTION, COMPLETED, CANCELLED]
+          example: APPROVED
+        total_amount:
+          type: number
+          format: float
+          example: 1250.50
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkOrderItem'
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-11-12T10:30:00+00:00"
+
+    WorkOrderItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        description:
+          type: string
+          example: Jogo de pastilhas de freio dianteiras
+        type:
+          type: string
+          enum: [PART, SERVICE]
+          example: PART
+        quantity:
+          type: integer
+          example: 1
+        unit_price:
+          type: number
+          format: float
+          example: 350.00
+
+    CreateWorkOrderRequest:
+      type: object
+      required:
+        - customer_id
+        - vehicle_plate
+        - description
+        - items
+      properties:
+        customer_id:
+          type: integer
+          example: 25
+        vehicle_plate:
+          type: string
+          example: ABC1D23
+        description:
+          type: string
+          example: Troca de óleo, filtros e pastilhas de freio
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required:
+              - description
+              - type
+              - quantity
+              - unit_price
+            properties:
+              description:
+                type: string
+                example: Mão de obra troca de freios
+              type:
+                type: string
+                enum: [PART, SERVICE]
+                example: SERVICE
+              quantity:
+                type: integer
+                minimum: 1
+                example: 1
+              unit_price:
+                type: number
+                format: float
+                minimum: 0
+                example: 200.00
