@@ -36,7 +36,7 @@ final class PaymentFailedConsumer
 
         $channel->basic_consume('queue.payment.failed', '', false, false, false, false, $callback);
 
-        while ($channel->is_consuming()) {
+        while (!empty($channel->callbacks)) {
             $channel->wait();
         }
     }

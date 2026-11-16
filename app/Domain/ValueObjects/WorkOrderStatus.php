@@ -17,7 +17,7 @@ enum WorkOrderStatus: string
     {
         return match ($this) {
             self::CREATED => in_array($next, [self::APPROVED, self::CANCELED], true),
-            self::APPROVED => in_array($next, [self::IN_PROGRESS, self::CANCELED], true),
+            self::APPROVED => in_array($next, [self::IN_PROGRESS, self::CANCELED, self::COMPLETED], true),
             self::AWAITING_PAYMENT => in_array($next, [self::IN_PROGRESS, self::CANCELED], true),
             self::IN_PROGRESS => in_array($next, [self::COMPLETED, self::CANCELED], true),
             self::COMPLETED, self::CANCELED => false,

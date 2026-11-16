@@ -33,13 +33,15 @@ final class RepairCompletedConsumer
 
         Log::info("Listening for repair completion events on {$queueName}...");
 
-        $callback = function (AMQPMessage $msg): void {
+        $callback = function (AMQPMessage $msg) use ($channel): void {
+            $deliveryTag = $msg->delivery_info['delivery_tag'];
+
             try {
                 $payload = json_decode($msg->body, true, 512, JSON_THROW_ON_ERROR);
 
                 if (!isset($payload['work_order_id'])) {
                     Log::warning('Received repair completed event without work_order_id', ['body' => $msg->body]);
-                    $msg->ack();
+                    $channel->basic_ack($deliveryTag);
                     return;
                 }
 
@@ -48,7 +50,7 @@ final class RepairCompletedConsumer
 
                 if (!$workOrder) {
                     Log::error("Work order not found for completion: {$workOrderId}");
-                    $msg->ack();
+                    $channel->basic_ack($deliveryTag);
                     return;
                 }
 
@@ -57,13 +59,13 @@ final class RepairCompletedConsumer
                 $this->repository->save($workOrder);
 
                 Log::info("Work order {$workOrderId} transitioned to COMPLETED successfully.");
-                $msg->ack();
+                $channel->basic_ack($deliveryTag);
             } catch (Exception $e) {
                 Log::error("Failed to process repair completed event: {$e->getMessage()}", [
                     'trace' => $e->getTraceAsString(),
                 ]);
                 // Rejeita e não reenvia caso o payload seja inválido
-                $msg->nack(false, false);
+                $channel->basic_nack($deliveryTag, false, false);
             }
         };
 
@@ -77,7 +79,7 @@ final class RepairCompletedConsumer
             $callback
         );
 
-        while ($channel->is_consuming()) {
+        while (!empty($channel->callbacks)) {
             $channel->wait();
         }
 
