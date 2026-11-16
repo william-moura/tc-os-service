@@ -38,4 +38,11 @@ final class WorkOrderRepository implements WorkOrderRepositoryInterface
 
         return $model ? WorkOrderMapper::toDomain($model) : null;
     }
+
+    public function findAll(): array
+    {
+        return WorkOrderModel::with('items')->get()->map(function (WorkOrderModel $model) {
+            return WorkOrderMapper::toDomain($model);
+        })->toArray();
+    }
 }

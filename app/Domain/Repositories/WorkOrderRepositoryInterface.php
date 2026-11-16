@@ -10,4 +10,5 @@ interface WorkOrderRepositoryInterface
 {
     public function save(WorkOrder $workOrder): WorkOrder;
     public function findById(int $id): ?WorkOrder;
+    public function findAll(): array;
 }
