@@ -16,7 +16,7 @@ final class ServiceItemDto
     /**
      * Instancia o DTO a partir de um array simples de dados (ex: vindo da Request HTTP).
      *
-     * @param array{id?: int|null, description: string, quantity: int|numeric, unit_price: float|numeric} $data
+     * @param  array{id?: int|null, description: string, quantity: int|numeric, unit_price: float|numeric}  $data
      */
     public static function fromArray(array $data): self
     {

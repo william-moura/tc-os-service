@@ -11,7 +11,7 @@ final class WorkOrderCanceledDomainEvent
     public function __construct(
         public readonly int $workOrderId,
         public readonly string $reason,
-        public readonly DateTimeImmutable $occurredOn = new DateTimeImmutable()
+        public readonly DateTimeImmutable $occurredOn = new DateTimeImmutable
     ) {}
 
     /**

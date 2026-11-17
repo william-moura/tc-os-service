@@ -22,7 +22,7 @@ final class CreateWorkOrderUseCase
     public function execute(CreateWorkOrderInputDto $input): WorkOrderOutputDto
     {
         $items = array_map(
-            fn(array $item) => new ServiceItem(
+            fn (array $item) => new ServiceItem(
                 id: null,
                 description: $item['description'],
                 quantity: (int) $item['quantity'],
@@ -46,7 +46,7 @@ final class CreateWorkOrderUseCase
             'work_order_id' => $savedOrder->getId(),
             'customer_id' => $savedOrder->getCustomerId(),
             'total_amount' => $savedOrder->getTotalAmount(),
-            'created_at' => (new \DateTimeImmutable())->format(DATE_ATOM),
+            'created_at' => (new \DateTimeImmutable)->format(DATE_ATOM),
         ]);
 
         return WorkOrderOutputDto::fromDomain($savedOrder);

@@ -19,7 +19,7 @@ final class UpdateWorkOrderStatusUseCase
     {
         $workOrder = $this->repository->findById($workOrderId);
 
-        if (!$workOrder) {
+        if (! $workOrder) {
             throw new WorkOrderNotFoundException("Work order with ID {$workOrderId} not found.");
         }
 

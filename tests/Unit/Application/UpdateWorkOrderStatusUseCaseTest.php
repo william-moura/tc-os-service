@@ -33,7 +33,7 @@ final class UpdateWorkOrderStatusUseCaseTest extends TestCase
 
         $repository->expects($this->once())
             ->method('save')
-            ->willReturnCallback(fn(WorkOrder $wo) => $wo);
+            ->willReturnCallback(fn (WorkOrder $wo) => $wo);
 
         $useCase = new UpdateWorkOrderStatusUseCase($repository);
         $output = $useCase->execute(1, WorkOrderStatus::AWAITING_PAYMENT->value);

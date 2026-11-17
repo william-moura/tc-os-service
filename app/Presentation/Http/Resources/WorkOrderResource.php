@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Presentation\Http\Resources;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -14,9 +16,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property string $status
  * @property float|string $total_amount
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Database\Eloquent\Collection|null $items
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Collection|null $items
  */
 final class WorkOrderResource extends JsonResource
 {
@@ -35,7 +37,7 @@ final class WorkOrderResource extends JsonResource
             'total_amount' => (float) $this->total_amount,
             'notes' => $this->notes,
             'items' => $this->whenLoaded('items', function () {
-                return $this->items->map(fn($item) => [
+                return $this->items->map(fn ($item) => [
                     'id' => $item->id,
                     'description' => $item->description,
                     'quantity' => (int) $item->quantity,

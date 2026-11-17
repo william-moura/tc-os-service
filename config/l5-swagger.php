@@ -1,5 +1,10 @@
 <?php
 
+use L5Swagger\CustomBuilderInterface;
+use L5Swagger\CustomGeneratorInterface;
+use L5Swagger\Generator;
+use OpenApi\scan;
+
 return [
     'default' => 'default',
     'documentations' => [
@@ -18,7 +23,7 @@ return [
                 /*
                  * Edit to include full URL in ui for assets
                  */
-                'use_absolute_path' => env('L5_SWAGGER_USE_ABSOLUTE_PATH', true),
+                'use_absolute_path' => env('L5_SWAGGER_USE_ABSOLUTE_PATH', false),
 
                 /*
                 * Edit to set path where swagger ui assets should be stored
@@ -38,7 +43,7 @@ return [
                 /*
                  * Set this to `json` or `yaml` to determine which documentation file to use in UI
                  */
-                'format_to_use_for_docs' => env('L5_FORMAT_TO_USE_FOR_DOCS', 'yaml'),
+                'format_to_use_for_docs' => env('L5_SWAGGER_FORMAT_TO_USE', 'yaml'),
 
                 /*
                  * Absolute paths to directory containing the swagger annotations are stored.
@@ -128,7 +133,7 @@ return [
              * Use this to provide a custom pre-configured generator.
              * Accepts an instance or a class name (FQCN) implementing the interface.
              *
-             * @see \L5Swagger\CustomGeneratorInterface
+             * @see CustomGeneratorInterface
              */
             'generator_factory' => null,
 
@@ -137,7 +142,7 @@ return [
              * Use this instead of `generator_factory` to generate through a pre-configured builder.
              * Accepts an instance or a class name (FQCN) implementing the interface.
              *
-             * @see \L5Swagger\CustomBuilderInterface
+             * @see CustomBuilderInterface
              */
             'builder_factory' => null,
 
@@ -162,7 +167,7 @@ return [
             /**
              * analyser: defaults to \OpenApi\StaticAnalyser .
              *
-             * @see \OpenApi\scan
+             * @see scan
              */
             'analyser' => null,
 
@@ -173,7 +178,7 @@ return [
              * directly instead of \OpenApi\Builder. swagger-php 7 deprecates the generator,
              * and swagger-php 8 removes it.
              *
-             * @see \OpenApi\scan
+             * @see scan
              */
             'analysis' => null,
 
@@ -186,7 +191,7 @@ return [
              *   ['class' => MyProcessor::class, 'after' => SomeProcessor::class]
              *
              * @link https://github.com/zircote/swagger-php/tree/master/Examples/processors/schema-query-parameter
-             * @see \OpenApi\scan
+             * @see scan
              */
             'processors' => [
                 // \App\SwaggerProcessors\SchemaQueryParameter::class,
@@ -196,7 +201,7 @@ return [
             /**
              * pattern: string       $pattern File pattern(s) to scan (default: *.php) .
              *
-             * @see \OpenApi\scan
+             * @see scan
              */
             'pattern' => null,
 
@@ -211,7 +216,7 @@ return [
              * Allows to generate specs either for OpenAPI 3.0.0 or OpenAPI 3.1.0.
              * By default the spec will be in version 3.0.0
              */
-            'open_api_spec_version' => env('L5_SWAGGER_OPEN_API_SPEC_VERSION', \L5Swagger\Generator::OPEN_API_DEFAULT_SPEC_VERSION),
+            'open_api_spec_version' => env('L5_SWAGGER_OPEN_API_SPEC_VERSION', Generator::OPEN_API_DEFAULT_SPEC_VERSION),
         ],
 
         /*

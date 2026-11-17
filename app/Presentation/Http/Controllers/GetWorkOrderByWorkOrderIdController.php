@@ -16,7 +16,8 @@ final class GetWorkOrderByWorkOrderIdController extends Controller
 
     public function __invoke(Request $request, int $workOrderId): JsonResponse
     {
-        $workOrder = $this->useCase->execute($workOrderId);        
+        $workOrder = $this->useCase->execute($workOrderId);
+
         return response()->json($workOrder, Response::HTTP_OK);
     }
 }
