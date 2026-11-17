@@ -8,7 +8,7 @@ info:
 
 servers:
   - url: /
-    description: Servidor Atual
+    description: Servidor OS Service VPS
   - url: http://tc-os-service
     description: Cluster Kubernetes (Interno)
 
