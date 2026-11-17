@@ -91,13 +91,14 @@ kind: Service
 metadata:
   name: tc-os-service
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: tc-os-service
     component: api
   ports:
     - port: 80
       targetPort: http
+      nodePort: 30081
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
