@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Presentation\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Application\UseCases\UpdateWorkOrderStatusUseCase;
 use App\Domain\ValueObjects\WorkOrderStatus;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
 final class ApproveWorkOrderController extends Controller

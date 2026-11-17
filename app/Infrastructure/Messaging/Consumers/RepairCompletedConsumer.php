@@ -39,18 +39,20 @@ final class RepairCompletedConsumer
             try {
                 $payload = json_decode($msg->body, true, 512, JSON_THROW_ON_ERROR);
 
-                if (!isset($payload['work_order_id'])) {
+                if (! isset($payload['work_order_id'])) {
                     Log::warning('Received repair completed event without work_order_id', ['body' => $msg->body]);
                     $channel->basic_ack($deliveryTag);
+
                     return;
                 }
 
                 $workOrderId = (int) $payload['work_order_id'];
                 $workOrder = $this->repository->findById($workOrderId);
 
-                if (!$workOrder) {
+                if (! $workOrder) {
                     Log::error("Work order not found for completion: {$workOrderId}");
                     $channel->basic_ack($deliveryTag);
+
                     return;
                 }
 
@@ -79,7 +81,7 @@ final class RepairCompletedConsumer
             $callback
         );
 
-        while (!empty($channel->callbacks)) {
+        while (! empty($channel->callbacks)) {
             $channel->wait();
         }
 

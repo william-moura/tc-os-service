@@ -17,7 +17,7 @@ final class CancelWorkOrderUseCase
     {
         $workOrder = $this->repository->findById($workOrderId);
 
-        if (!$workOrder) {
+        if (! $workOrder) {
             throw new RuntimeException("Work order not found: {$workOrderId}");
         }
 

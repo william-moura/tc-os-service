@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Domain\Entities;
 
-use App\Domain\ValueObjects\WorkOrderStatus;
-use App\Domain\ValueObjects\VehiclePlate;
 use App\Domain\Exceptions\InvalidStatusTransitionException;
-use App\Domain\Entities\ServiceItem;
+use App\Domain\ValueObjects\VehiclePlate;
+use App\Domain\ValueObjects\WorkOrderStatus;
 
 final class WorkOrder
 {
@@ -35,7 +34,7 @@ final class WorkOrder
 
     public function transitionTo(WorkOrderStatus $newStatus): void
     {
-        if (!$this->status->canTransitionTo($newStatus)) {
+        if (! $this->status->canTransitionTo($newStatus)) {
             throw new InvalidStatusTransitionException(
                 "Cannot transition work order from {$this->status->value} to {$newStatus->value}"
             );
@@ -56,15 +55,38 @@ final class WorkOrder
     {
         return array_reduce(
             $this->items,
-            fn(float $carry, ServiceItem $item) => $carry + $item->getTotal(),
+            fn (float $carry, ServiceItem $item) => $carry + $item->getTotal(),
             0.0
         );
     }
 
-    public function getId(): ?int { return $this->id; }
-    public function getCustomerId(): int { return $this->customerId; }
-    public function getVehiclePlate(): VehiclePlate { return $this->vehiclePlate; }
-    public function getStatus(): WorkOrderStatus { return $this->status; }
-    public function getItems(): array { return $this->items; }
-    public function getNotes(): ?string { return $this->notes; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getCustomerId(): int
+    {
+        return $this->customerId;
+    }
+
+    public function getVehiclePlate(): VehiclePlate
+    {
+        return $this->vehiclePlate;
+    }
+
+    public function getStatus(): WorkOrderStatus
+    {
+        return $this->status;
+    }
+
+    public function getItems(): array
+    {
+        return $this->items;
+    }
+
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
 }

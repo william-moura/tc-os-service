@@ -11,6 +11,7 @@ use Illuminate\Console\Command;
 final class StartRabbitMQConsumers extends Command
 {
     protected $signature = 'rabbitmq:consume {queue=all : The queue to listen to (all, payment-failed, repair-completed)}';
+
     protected $description = 'Consume RabbitMQ events for Saga Pattern coordination';
 
     public function handle(

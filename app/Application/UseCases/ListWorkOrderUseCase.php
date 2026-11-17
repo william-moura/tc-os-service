@@ -20,6 +20,7 @@ final class ListWorkOrderUseCase
         $workOrdersOutput = array_map(function (WorkOrder $workOrder) {
             return WorkOrderOutputDto::fromDomain($workOrder);
         }, $workOrders);
+
         return $workOrdersOutput;
     }
 }

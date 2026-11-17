@@ -28,9 +28,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
-        $this->commands([
-            StartRabbitMQConsumers::class,
-        ]);
-    }
+            $this->commands([
+                StartRabbitMQConsumers::class,
+            ]);
+        }
     }
 }

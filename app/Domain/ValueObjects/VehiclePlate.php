@@ -15,7 +15,7 @@ final class VehiclePlate
         $normalized = strtoupper(trim(str_replace('-', '', $plate)));
 
         // Valida placa padrão Mercosul (ABC1D23) ou antigo (ABC1234)
-        if (!preg_match('/^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/', $normalized)) {
+        if (! preg_match('/^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/', $normalized)) {
             throw new InvalidArgumentException("Invalid vehicle plate format: {$plate}");
         }
 

@@ -13,7 +13,7 @@ final class WorkOrderCreatedDomainEvent
         public readonly int $customerId,
         public readonly string $vehiclePlate,
         public readonly float $totalAmount,
-        public readonly DateTimeImmutable $occurredOn = new DateTimeImmutable()
+        public readonly DateTimeImmutable $occurredOn = new DateTimeImmutable
     ) {}
 
     /**

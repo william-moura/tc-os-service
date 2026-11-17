@@ -8,12 +8,9 @@ use App\Application\DTOs\CreateWorkOrderInputDto;
 use App\Application\UseCases\CreateWorkOrderUseCase;
 use App\Application\UseCases\GetWorkOrderUseCase;
 use App\Domain\Exceptions\WorkOrderNotFoundException;
-use App\Domain\Repositories\WorkOrderRepositoryInterface;
 use App\Presentation\Http\Requests\CreateWorkOrderRequest;
-use App\Presentation\Http\Resources\WorkOrderResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class WorkOrderController extends Controller
 {
@@ -35,6 +32,7 @@ final class WorkOrderController extends Controller
     {
         try {
             $output = $useCase->execute($id);
+
             return response()->json($output, 200);
         } catch (WorkOrderNotFoundException $e) {
             return response()->json(['message' => $e->getMessage()], 404);
