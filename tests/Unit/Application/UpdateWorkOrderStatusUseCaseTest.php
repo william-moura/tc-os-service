@@ -21,7 +21,7 @@ final class UpdateWorkOrderStatusUseCaseTest extends TestCase
             id: 1,
             customerId: 100,
             vehiclePlate: new VehiclePlate('ABC1234'),
-            status: WorkOrderStatus::CREATED,
+            status: WorkOrderStatus::APPROVED,
             items: []
         );
 
