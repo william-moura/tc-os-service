@@ -36,9 +36,9 @@ final class UpdateWorkOrderStatusUseCaseTest extends TestCase
             ->willReturnCallback(fn (WorkOrder $wo) => $wo);
 
         $useCase = new UpdateWorkOrderStatusUseCase($repository);
-        $output = $useCase->execute(1, WorkOrderStatus::AWAITING_PAYMENT->value);
+        $output = $useCase->execute(1, WorkOrderStatus::APPROVED->value);
 
-        $this->assertSame(WorkOrderStatus::AWAITING_PAYMENT->value, $output->status);
+        $this->assertSame(WorkOrderStatus::APPROVED->value, $output->status);
     }
 
     public function test_should_throw_exception_when_work_order_not_found(): void
