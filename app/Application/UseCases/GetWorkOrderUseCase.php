@@ -16,8 +16,7 @@ final class GetWorkOrderUseCase
 
     public function execute(int $workOrderId): WorkOrderOutputDto
     {
-        $workOrder = $this->repository->findById($workOrderId);
-
+        $workOrder = $this->repository->findById($workOrderId);        
         if (!$workOrder) {
             throw new WorkOrderNotFoundException("Work order with ID {$workOrderId} not found.");
         }

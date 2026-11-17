@@ -7,6 +7,7 @@ use App\Domain\Repositories\WorkOrderRepositoryInterface;
 use App\Infrastructure\Messaging\Publishers\WorkOrderRabbitMQPublisher;
 use App\Infrastructure\Messaging\RabbitMQService;
 use App\Infrastructure\Repositories\WorkOrderRepository;
+use App\Presentation\Console\Commands\StartRabbitMQConsumers;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        if ($this->app->runningInConsole()) {
+        $this->commands([
+            StartRabbitMQConsumers::class,
+        ]);
+    }
     }
 }
